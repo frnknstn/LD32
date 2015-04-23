@@ -5,6 +5,22 @@ from star import Star
 import random
 import math
 
+if False:
+	# a hint for cx_freeze
+	import pygame._view
+
+def pygame_default_font(size):
+	"""Emulate the output of pygame.font.SysFont("", size), but in a way that doesn't crash if run through cx_Freeze"""
+
+	# reduce the size to match what pygame's font.c:font_init() does
+	# reportedly, this is to keep the modern pygame default font roughly the same size as that of older pygame versions.
+	size = int(size * 0.6875)
+	if size < 1:
+		size = 1
+
+	return pygame.font.Font("media/freesansbold.ttf", size)
+
+
 print "Hello"
 
 black = 0, 0, 0
@@ -18,7 +34,7 @@ height = 600
 screen = pygame.display.set_mode((width, height))
 background = pygame.Surface(screen.get_size())
 backgroundImage = pygame.image.load("media/background.png").convert()
-myFont = pygame.font.SysFont(None, 15)
+myFont = pygame_default_font(15)
 
 def createNewEnemy():
 	r = 400*random.random() + 100
@@ -34,12 +50,12 @@ def createNewStar(ii):
 	return Star(screen, width/4+ii*width/2, (height/2)*random.random()+(height/4))
 	
 def displayScore(score):
-	font = pygame.font.Font(None, 30)
+	font = pygame_default_font(30)
 	scoretext = font.render("Score: "+str(score), 1, white)
 	screen.blit(scoretext, (10, 10))
 
 def displayTime(time):
-	font = pygame.font.Font(None, 30)
+	font = pygame_default_font(30)
 	timetext = font.render("Time Left: "+str(time), 1, white)
 	screen.blit(timetext, (650, 10))
 
@@ -112,8 +128,8 @@ while running:
 	displayTime(60-int(nframes/60.))
 	clock.tick(60)
 	if nframes/60 > 60:
-		fontGO = pygame.font.Font(None, 60)
-		fontScore = pygame.font.Font(None, 40)
+		fontGO = pygame_default_font(60)
+		fontScore = pygame_default_font(40)
 		gameOverText = fontGO.render("Game Over", 1, white)
 		screen.blit(gameOverText, (285, 300))
 		scoretext = fontScore.render("Final Score: "+str(player.score), 1, white)
